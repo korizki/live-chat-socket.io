@@ -10,9 +10,10 @@ const io = new Server(server)
 app.use(express.static("public"))
 // menggunakan socket io
 io.on("connection", (socket) => {
-    socket.on("chat", message => {
+    socket.on("chat", arg => {
         io.emit("chatToClient", {id: socket.id, message})
     })
+    socket.on("disconnect", () => console.log("Disconnected from server."))
     console.log("Connected on port 3000")
 })
 // inisialisasi port server

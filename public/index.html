@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat - Socket.io</title>
+</head>
+<style>
+    /* import google font */
+    @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap');
+
+    *{
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: 'Source Sans Pro', sans-serif;
+    }
+    .chatcontainer{
+        width: 100%;
+        padding: 0.2em 0.5em;
+        height: 40em;
+        background-image: url("bg.jpg"); 
+        background-position: center;
+        background-size: cover;
+    }
+    .form{
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5em;
+        background: white;
+        transform: translateY(-2em);
+        width: 100%;
+        gap: 0.5em;
+    }
+    .form input{
+        padding: 0.7em;
+        flex: 1;
+        border: 1px solid rgb(240,240,240);
+        border-radius: 0.3em;
+    }
+    .form input:focus{
+        outline: 2px solid cornflowerblue;
+    }
+    .form button{
+        border-radius: 0.3em;
+        padding: 0.7em;
+        border: 1px solid transparent;
+        background: cornflowerblue;
+        color: white;
+    }
+    .messageitem{
+        display: inline-block;
+        margin: 0.2em 0;
+        background: white;
+        border-radius: 0.5em 0.5em 0 0.5em;
+        padding: 0.7em;
+        align-items: flex-end;
+    }
+    .boxm{
+        display: flex;
+        justify-content: flex-start;
+    }
+    .boxm>span{
+        background: rgb(221, 247, 227);
+    }
+    .sender>span{
+        background: rgb(250, 237, 205);
+    }
+    .sender{
+        justify-content: flex-end;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class="chatcontainer"></div>
+        <form class="form">
+            <input type="text" placeholder="Type message ..." autocomplete="off" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <!-- menggunakan cdn socket io -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+    <script>
+        // menggunakan socket.io
+        const socket = io("ws://localhost:3000")
+        // menentukan id user
+        let id
+        socket.on("connect", () => {
+            console.log("Client connected.")
+            // menentukan id user
+            id = socket.id
+        })
+        // merespon emmit dari server jika klik kirim pesan
+        socket.on("chatToClient", arg => {
+            document.querySelector(".chatcontainer").innerHTML += `
+            <div class="${arg.id == id ? 'sender boxm' : 'boxm'}">
+                <span class="messageitem">${arg.message}</span>
+            </div>
+            `
+        })
+        // event listener on submit / send chat
+        document.querySelector(".form").addEventListener('submit', (e) => {
+            // mencegah browser auto refresh 
+            e.preventDefault()
+            const message = document.querySelector("input").value
+            // menjalankan event emit ke server
+            socket.emit("chat", message)
+            // menghapus pesan pada input chat
+            document.querySelector("input").value = ""
+        })
+    </script>
+</body>
+</html>
