@@ -11,7 +11,6 @@ app.use(express.static("public"))
 // menggunakan socket io
 io.on("connection", (socket) => {
     socket.on("chat", message => {
-        console.log(message)
         io.emit("chatToClient", {id: socket.id, message})
     })
     socket.on("disconnect", () => console.log("Disconnected from server."))
